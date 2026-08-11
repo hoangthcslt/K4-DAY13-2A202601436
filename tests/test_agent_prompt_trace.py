@@ -29,6 +29,9 @@ class RecordingLangfuseClient:
     def update_current_generation(self, **kwargs) -> None:
         self.generation_updates.append(kwargs)
 
+    def get_current_trace_id(self) -> str:
+        return "trace-checkpoint-2"
+
 
 def test_agent_links_prompt_version_to_trace_and_generation(monkeypatch) -> None:
     monkeypatch.setenv("LANGFUSE_PUBLIC_KEY", "test-public-key")
@@ -39,7 +42,7 @@ def test_agent_links_prompt_version_to_trace_and_generation(monkeypatch) -> None
     monkeypatch.setattr(agent_module, "get_langfuse_client", lambda: client)
 
     agent = agent_module.LabAgent()
-    agent_module.LabAgent.run.__wrapped__(
+    result = agent_module.LabAgent.run.__wrapped__(
         agent,
         user_id="student-01",
         feature="qa",
@@ -57,3 +60,25 @@ def test_agent_links_prompt_version_to_trace_and_generation(monkeypatch) -> None
     }
     assert generation_update["prompt"] is client.prompt
     assert generation_update["metadata"]["prompt_version"] == "3"
+    assert result.trace_id == "trace-checkpoint-2"
+
+
+def test_agent_adds_correlation_id_to_langfuse_trace(monkeypatch) -> None:
+    monkeypatch.setenv("LANGFUSE_PUBLIC_KEY", "test-public-key")
+    monkeypatch.setenv("LANGFUSE_SECRET_KEY", "test-secret-key")
+    client = RecordingLangfuseClient()
+    monkeypatch.setattr(agent_module, "get_langfuse_client", lambda: client)
+
+    agent = agent_module.LabAgent()
+    result = agent_module.LabAgent.run.__wrapped__(
+        agent,
+        user_id="student-01",
+        feature="qa",
+        session_id="session-01",
+        message="Explain traces",
+        correlation_id="req-cp2trace",
+    )
+
+    assert result.trace_id == "trace-checkpoint-2"
+    assert client.trace_updates[0]["metadata"]["correlation_id"] == "req-cp2trace"
+    assert client.trace_updates[-1]["metadata"]["correlation_id"] == "req-cp2trace"

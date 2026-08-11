@@ -30,6 +30,27 @@ Nếu Langfuse không khả dụng, app dùng template local và trace metadata 
 5. Chuyển label `production` sang version 2, chạy lại một request.
 6. Rollback `production` về version 1 và lưu ảnh evidence.
 
+Repository có script để các thao tác trên lặp lại được và không ghi key vào source:
+
+```bash
+# Tạo baseline/candidate nếu label chưa tồn tại
+python scripts/manage_langfuse_prompts.py bootstrap
+
+# Xem version hiện được trỏ bởi ba label
+python scripts/manage_langfuse_prompts.py status
+
+# Chuyển production sang candidate, gửi request để lấy trace evidence
+python scripts/manage_langfuse_prompts.py promote
+
+# Rollback production về baseline
+python scripts/manage_langfuse_prompts.py rollback
+```
+
+`bootstrap` là idempotent theo label: chạy lại sẽ không tạo thêm version khi
+`baseline` và `candidate` đã tồn tại. Mỗi lệnh xác thực Langfuse trước khi thay
+đổi; lỗi 401 nghĩa là phải kiểm tra lại cặp key và `LANGFUSE_HOST`, không sửa code
+để giả version.
+
 Không chấm prompt nào “hay hơn”. Điểm nằm ở khả năng truy xuất version, đổi label và rollback có bằng chứng.
 
 ## Evidence

@@ -1,16 +1,57 @@
+schema_version: 1
 service: day13-observability-lab
+owner: ai-platform
 window: 28d
+window_type: rolling
+data_source: data/logs.jsonl
+evaluation_interval: 5m
+
+# `objective` is the threshold shown on the dashboard. `target` is the
+# percentage of eligible measurement windows that must satisfy that threshold.
 slis:
   latency_p95_ms:
+    description: P95 latency of successful chat responses
+    events: [response_sent]
+    formula: percentile(latency_ms, 95)
+    comparison: lte
     objective: 3000
+    objective_unit: ms
     target: 99.5
-    note: Replace with your group's target
+    target_unit: percent_of_eligible_windows
+    minimum_requests_per_window: 5
+    error_budget_percent: 0.5
+
   error_rate_pct:
+    description: Percentage of accepted chat requests ending in request_failed
+    events: [request_received, request_failed]
+    formula: count(request_failed) / count(request_received) * 100
+    comparison: lte
     objective: 2
+    objective_unit: percent
     target: 99.0
+    target_unit: percent_of_eligible_windows
+    minimum_requests_per_window: 5
+    error_budget_percent: 1.0
+
   daily_cost_usd:
+    description: Total estimated LLM cost per UTC calendar day
+    events: [response_sent]
+    formula: sum(cost_usd) by 1d
+    comparison: lte
     objective: 2.5
+    objective_unit: usd_per_day
     target: 100.0
+    target_unit: percent_of_calendar_days
+    error_budget_percent: 0.0
+
   quality_score_avg:
+    description: Mean heuristic quality score of successful chat responses
+    events: [response_sent]
+    formula: mean(quality_score)
+    comparison: gte
     objective: 0.75
+    objective_unit: score_0_to_1
     target: 95.0
+    target_unit: percent_of_eligible_windows
+    minimum_requests_per_window: 5
+    error_budget_percent: 5.0

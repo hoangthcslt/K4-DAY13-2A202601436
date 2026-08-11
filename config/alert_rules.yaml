@@ -1,19 +1,41 @@
+schema_version: 1
+service: day13-observability-lab
+data_source: data/logs.jsonl
+evaluation_interval: 1m
+defaults:
+  owner: ai-platform-oncall
+  type: symptom-based
+
 alerts:
-  - name: TODO_alert_1
-    severity: TODO
-    condition: TODO
+  - name: chat_high_error_rate
+    severity: critical
+    sli: error_rate_pct
+    condition: error_rate_pct > 2 AND request_count >= 20
+    window: 5m
+    for: 10m
     type: symptom-based
-    owner: TODO
-    runbook: docs/alerts.md#alert-1
-  - name: TODO_alert_2
-    severity: TODO
-    condition: TODO
+    owner: ai-platform-oncall
+    summary: More than 2 percent of chat requests are failing.
+    runbook: docs/alerts.md#chat-high-error-rate
+
+  - name: chat_high_p95_latency
+    severity: critical
+    sli: latency_p95_ms
+    condition: latency_p95_ms > 3000 AND response_count >= 5
+    window: 5m
+    for: 10m
     type: symptom-based
-    owner: TODO
-    runbook: docs/alerts.md#alert-2
-  - name: TODO_alert_3
-    severity: TODO
-    condition: TODO
+    owner: ai-platform-oncall
+    summary: Users are waiting more than 3 seconds at the 95th percentile.
+    runbook: docs/alerts.md#chat-high-p95-latency
+
+  - name: chat_quality_degradation
+    severity: warning
+    sli: quality_score_avg
+    condition: quality_score_avg < 0.75 AND response_count >= 10
+    window: 15m
+    for: 15m
     type: symptom-based
-    owner: TODO
-    runbook: docs/alerts.md#alert-3
+    owner: ai-quality
+    summary: The quality proxy is below its agreed threshold.
+    runbook: docs/alerts.md#chat-quality-degradation

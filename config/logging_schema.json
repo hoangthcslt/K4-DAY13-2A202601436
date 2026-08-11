@@ -8,6 +8,7 @@
     "service": {"type": "string"},
     "event": {"type": "string"},
     "correlation_id": {"type": "string"},
+    "trace_id": {"type": ["string", "null"]},
     "env": {"type": ["string", "null"]},
     "user_id_hash": {"type": ["string", "null"]},
     "session_id": {"type": ["string", "null"]},

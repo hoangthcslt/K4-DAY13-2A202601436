@@ -41,6 +41,7 @@ SAFE_KEYS: frozenset[str] = frozenset(
         "level",
         "service",
         "user_id_hash",
+        "trace_id",
         "model",
         "env",
     }

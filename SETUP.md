@@ -95,6 +95,7 @@ API mặc định chạy tại `http://127.0.0.1:8000`; health check ở `/healt
 - `ModuleNotFoundError`: kiểm tra virtual environment đã được activate và chạy lại `pip install -r requirements.txt`.
 - Không có `data/logs.jsonl`: bảo đảm API đang chạy trước khi chạy load test.
 - Không thấy trace: kiểm tra ba biến `LANGFUSE_*`, sau đó khởi động lại API.
+- `auth_check` trả 401: public/secret key không thuộc project tại `LANGFUSE_HOST`; cập nhật đúng cả ba giá trị rồi chạy `python scripts/manage_langfuse_prompts.py status`.
 - Trace ghi `prompt_source=local-fallback`: kiểm tra host/key và prompt name/label trong `.env`.
 - Docker local không lên: chạy `docker compose ps`, kiểm tra Docker Desktop và tài nguyên máy; có thể quay về project chung/cloud.
 - Challenge chưa chạy: chờ Lab Coach release `config/challenge.json`.

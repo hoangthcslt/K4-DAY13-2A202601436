@@ -21,6 +21,7 @@ class ChatResponse(BaseModel):
     tokens_out: int
     cost_usd: float
     quality_score: float
+    trace_id: str | None = None
 
 
 class LogRecord(BaseModel):
@@ -30,6 +31,7 @@ class LogRecord(BaseModel):
     event: str
     correlation_id: str
     env: str
+    trace_id: str | None = None
     user_id_hash: str | None = None
     session_id: str | None = None
     feature: str | None = None

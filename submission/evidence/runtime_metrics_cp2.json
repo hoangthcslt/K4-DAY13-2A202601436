@@ -1,0 +1,21 @@
+{
+  "scenario": "2 successful requests followed by 1 tool_fail request",
+  "health_ok": true,
+  "tracing_enabled": true,
+  "successful_trace_ids": [
+    "5831c0ad9a97784a50284ef6bb921ce7",
+    "d5fafdbd303a52f815c2a23a786ab9f1"
+  ],
+  "failed_status": 500,
+  "metrics": {
+    "traffic": 3,
+    "successful_requests_total": 2,
+    "errors_total": 1,
+    "error_rate_pct": 33.33,
+    "error_breakdown": {
+      "RuntimeError": 1
+    }
+  },
+  "langfuse_ingestion_verified": false,
+  "langfuse_ingestion_note": "The configured endpoint returned HTTP 401 during auth_check; local SDK trace IDs are real but do not prove remote ingestion."
+}
