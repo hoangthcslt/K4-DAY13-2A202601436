@@ -98,12 +98,29 @@ bài lab. Bằng chứng: `test_scrub_value_keeps_structural_fields_intact` và
 - Toàn bộ suite: **42 passed** (22 test có sẵn + 20 test mới, không phá test của A/C).
 - `python scripts/validate_logs.py` → **100/100**, `Potential PII leaks detected: 0`
   trên 30 record (xem `validate_logs_cp1_security.txt`).
-- Log thật của 4 request probe: xem `log_pii_global_redaction_sample.jsonl`.
 
-Input gốc gửi vào API (không ghi xuống log, chỉ để đối chiếu):
+### 5.1 Bằng chứng trên dữ liệu chính thức của lab
+
+`data/sample_queries.jsonl` đã cắm sẵn ba loại PII. Toàn bộ 10 query này được gửi
+qua API và đây là log thật sinh ra:
+
+| Session | Input gốc trong `sample_queries.jsonl` | `message_preview` trong log |
+|---|---|---|
+| `s01` | `...My email is student@vinuni.edu.vn` | `...My email is [REDACTED_EMAIL]` |
+| `s05` | `Here is my phone 0987654321, ...` | `Here is my phone [REDACTED_PHONE_VN], ...` |
+| `s09` | `...credit card 4111 1111 1111 1111?` | `...credit card [REDACTED_CREDIT_CARD]?` |
+
+Correlation ID tương ứng: `req-d59990e5`, `req-e1852d42`, `req-13ecffa9` —
+xem `log_pii_global_redaction_sample.jsonl`.
+
+### 5.2 Fixture bổ sung cho phần dữ liệu lab không phủ
+
+`sample_queries.jsonl` không có mẫu nào cho các pattern được thêm ở mục 2–3, và
+cũng không có câu nào để kiểm tra chiều ngược lại (log vận hành **không** được bị
+che nhầm). Bốn request dưới đây được thêm để phủ đúng hai khoảng trống đó — giá
+trị dùng là dữ liệu tổng hợp, không phải thông tin của người thật:
 
 ```text
-pii-session-01: "Lien he toi qua 0912345678 hoac email test.pii@vinuni.edu.vn, the 4111 1111 1111 1111"
 pii-session-02: "CCCD cua toi la 012345678901, passport B1234567, IP 192.168.1.104"
 pii-session-03: "Giao hang toi 123 Nguyen Trai, Phuong 7, Quan 5 va 45 Le Loi, Phường Bến Nghé"
 pii-session-04: "Latency 3000 ms, quan sat p95 tang manh va tinh trang dang xau di"  <- phải giữ nguyên
@@ -112,10 +129,22 @@ pii-session-04: "Latency 3000 ms, quan sat p95 tang manh va tinh trang dang xau 
 Kết quả trong log:
 
 ```text
-req-7c9b633f  Lien he toi qua [REDACTED_PHONE_VN] hoac email [REDACTED_EMAIL], the [REDACTED_C...
 req-2bd9926e  CCCD cua toi la [REDACTED_CCCD], passport [REDACTED_PASSPORT], IP [REDACTED_IP_A...
 req-105f1db6  Giao hang toi [REDACTED_VN_ADDRESS], Quan [REDACTED_VN_ADDRESS]
 req-eb47a73f  Latency 3000 ms, quan sat p95 tang manh va tinh trang dang xau di
 ```
 
-Ba dòng đầu bị che đúng loại PII; dòng thứ tư là log vận hành và được giữ nguyên.
+Hai dòng đầu bị che đúng loại PII; dòng thứ ba là log vận hành và được giữ nguyên.
+
+### 5.3 Vì sao ba lỗ hổng ở mục 1 phải repro bằng lời gọi logger
+
+Ba trường hợp ở mục 1 **không thể tạo ra bằng bất kỳ input nào gửi vào `/chat`**,
+kể cả input trong `config/challenge.json`: `app/main.py` luôn ghi payload phẳng
+`{"message_preview": ...}` và không dùng `exc_info`. Payload lồng nhau, traceback
+và field top-level là đặc tính của **cách gọi log**, không phải nội dung request.
+Vì vậy repro và test cho ba trường hợp này gọi thẳng structlog logger — xem
+`tests/test_pii_global_redaction.py`.
+
+Đây cũng chính là lý do phải sửa: ngay khi một thành viên khác thêm một dòng
+`log.error(..., exc_info=True)` hoặc một payload lồng nhau trong CP2/CP3, PII sẽ
+rò mà `validate_logs.py` vẫn báo xanh.
