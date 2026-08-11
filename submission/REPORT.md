@@ -4,7 +4,7 @@
 
 - Tên nhóm: ABCD
 - Repository URL: https://github.com/hoangthcslt/K4-DAY13-2A202601436.git
-- Commit SHA cuối:
+- Commit SHA cuối: 1d4236e
 - Thành viên và vai trò: 
 * Dương Văn Kiên - 2A202601724 : Phụ trách CP1 (Middleware, Correlation ID, và gán log metadata).
 * Trần Tiến Dũng - 2A202601064 : Phụ trách CP1 (Uncomment processor, cấu hình regex patterns che PII và nâng cấp che PII toàn cục).
