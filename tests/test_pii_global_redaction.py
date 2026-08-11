@@ -56,6 +56,31 @@ def test_scrub_value_keeps_structural_fields_intact() -> None:
     assert "user_id_hash" in SAFE_KEYS
 
 
+def test_client_controlled_fields_are_scrubbed() -> None:
+    """session_id/feature/correlation_id đến từ request nên client đặt được PII vào."""
+    out = scrub_value(
+        {
+            "session_id": "0912345678",
+            "feature": "lienhe-4111 1111 1111 1111",
+            "correlation_id": "req-student@vinuni.edu.vn",
+        }
+    )
+
+    assert out["session_id"] == "[REDACTED_PHONE_VN]"
+    assert out["feature"] == "lienhe-[REDACTED_CREDIT_CARD]"
+    # [\w.-]+@ nuốt luôn tiền tố "req-" nên cả chuỗi thành một token redacted.
+    assert out["correlation_id"] == "[REDACTED_EMAIL]"
+    assert not {"session_id", "feature", "correlation_id"} & SAFE_KEYS
+
+
+def test_redacted_correlation_id_still_correlates() -> None:
+    """Redact là ánh xạ tất định nên hai log của cùng request vẫn nối được."""
+    first = scrub_value({"correlation_id": "0912345678", "event": "request_received"})
+    second = scrub_value({"correlation_id": "0912345678", "event": "response_sent"})
+
+    assert first["correlation_id"] == second["correlation_id"]
+
+
 def test_scrub_value_stops_at_max_depth() -> None:
     deep: dict = {"level": None}
     node = deep
