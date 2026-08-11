@@ -3,29 +3,31 @@ platform linux -- Python 3.11.15, pytest-8.3.5, pluggy-1.6.0 -- /home/dungtt/min
 cachedir: .pytest_cache
 rootdir: /home/dungtt/Code/K4-DAY13-2A202601436
 plugins: anyio-4.14.2
-collecting ... collected 22 items
+collecting ... collected 24 items
 
 tests/test_pii.py::test_scrub_email PASSED                               [  4%]
-tests/test_pii.py::test_scrub_common_vietnamese_phone_formats PASSED     [  9%]
-tests/test_pii_global_redaction.py::test_scrub_value_walks_nested_dict_and_list PASSED [ 13%]
-tests/test_pii_global_redaction.py::test_scrub_value_preserves_non_string_types PASSED [ 18%]
-tests/test_pii_global_redaction.py::test_scrub_value_keeps_structural_fields_intact PASSED [ 22%]
-tests/test_pii_global_redaction.py::test_scrub_value_stops_at_max_depth PASSED [ 27%]
-tests/test_pii_global_redaction.py::test_nested_payload_is_redacted_in_log_file PASSED [ 31%]
-tests/test_pii_global_redaction.py::test_exception_traceback_is_redacted_in_log_file PASSED [ 36%]
-tests/test_pii_global_redaction.py::test_top_level_custom_field_is_redacted PASSED [ 40%]
-tests/test_pii_global_redaction.py::test_correlation_metadata_survives_redaction PASSED [ 45%]
-tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[Passport B1234567 het han-[REDACTED_PASSPORT]] PASSED [ 50%]
-tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[CCCD 012345678901 cua khach-[REDACTED_CCCD]] PASSED [ 54%]
-tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[The 4111-1111-1111-1111 bi tu choi-[REDACTED_CREDIT_CARD]] PASSED [ 59%]
-tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[Client IP 192.168.1.104 gui request-[REDACTED_IP_ADDRESS]] PASSED [ 63%]
-tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[Nha o 123 Nguyen Trai, Phuong 7-[REDACTED_VN_ADDRESS]] PASSED [ 68%]
-tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[Dia chi 45 Le Loi, Ph\u01b0\u1eddng B\u1ebfn Ngh\xe9-[REDACTED_VN_ADDRESS]] PASSED [ 72%]
-tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[So 12 Hai Ba Trung, Tinh Binh Duong-[REDACTED_VN_ADDRESS]] PASSED [ 77%]
-tests/test_pii_global_redaction.py::test_observability_messages_are_not_over_redacted[Latency 3000 ms, quan sat p95 tang manh] PASSED [ 81%]
-tests/test_pii_global_redaction.py::test_observability_messages_are_not_over_redacted[Co 500 request, lien quan den incident rag_slow] PASSED [ 86%]
-tests/test_pii_global_redaction.py::test_observability_messages_are_not_over_redacted[Threshold 2000 ms, xa hon muc SLO] PASSED [ 90%]
+tests/test_pii.py::test_scrub_common_vietnamese_phone_formats PASSED     [  8%]
+tests/test_pii_global_redaction.py::test_scrub_value_walks_nested_dict_and_list PASSED [ 12%]
+tests/test_pii_global_redaction.py::test_scrub_value_preserves_non_string_types PASSED [ 16%]
+tests/test_pii_global_redaction.py::test_scrub_value_keeps_structural_fields_intact PASSED [ 20%]
+tests/test_pii_global_redaction.py::test_client_controlled_fields_are_scrubbed PASSED [ 25%]
+tests/test_pii_global_redaction.py::test_redacted_correlation_id_still_correlates PASSED [ 29%]
+tests/test_pii_global_redaction.py::test_scrub_value_stops_at_max_depth PASSED [ 33%]
+tests/test_pii_global_redaction.py::test_nested_payload_is_redacted_in_log_file PASSED [ 37%]
+tests/test_pii_global_redaction.py::test_exception_traceback_is_redacted_in_log_file PASSED [ 41%]
+tests/test_pii_global_redaction.py::test_top_level_custom_field_is_redacted PASSED [ 45%]
+tests/test_pii_global_redaction.py::test_correlation_metadata_survives_redaction PASSED [ 50%]
+tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[Passport B1234567 het han-[REDACTED_PASSPORT]] PASSED [ 54%]
+tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[CCCD 012345678901 cua khach-[REDACTED_CCCD]] PASSED [ 58%]
+tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[The 4111-1111-1111-1111 bi tu choi-[REDACTED_CREDIT_CARD]] PASSED [ 62%]
+tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[Client IP 192.168.1.104 gui request-[REDACTED_IP_ADDRESS]] PASSED [ 66%]
+tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[Nha o 123 Nguyen Trai, Phuong 7-[REDACTED_VN_ADDRESS]] PASSED [ 70%]
+tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[Dia chi 45 Le Loi, Ph\u01b0\u1eddng B\u1ebfn Ngh\xe9-[REDACTED_VN_ADDRESS]] PASSED [ 75%]
+tests/test_pii_global_redaction.py::test_new_patterns_are_redacted[So 12 Hai Ba Trung, Tinh Binh Duong-[REDACTED_VN_ADDRESS]] PASSED [ 79%]
+tests/test_pii_global_redaction.py::test_observability_messages_are_not_over_redacted[Latency 3000 ms, quan sat p95 tang manh] PASSED [ 83%]
+tests/test_pii_global_redaction.py::test_observability_messages_are_not_over_redacted[Co 500 request, lien quan den incident rag_slow] PASSED [ 87%]
+tests/test_pii_global_redaction.py::test_observability_messages_are_not_over_redacted[Threshold 2000 ms, xa hon muc SLO] PASSED [ 91%]
 tests/test_pii_global_redaction.py::test_observability_messages_are_not_over_redacted[Ghi nhan 15 loi, tinh trang dang xau di] PASSED [ 95%]
 tests/test_pii_global_redaction.py::test_observability_messages_are_not_over_redacted[P95 la 4200 ms, thanh pho khong lien quan] PASSED [100%]
 
-============================== 22 passed in 0.04s ==============================
+============================== 24 passed in 0.05s ==============================

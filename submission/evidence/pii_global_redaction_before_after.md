@@ -80,16 +80,42 @@ Bằng chứng: `test_new_patterns_are_redacted` và
 - Đổi thứ tự pattern: `credit_card` chạy trước `cccd` để chuỗi 16 số không bị
   pattern 12 số cắt trước.
 
-## 4. Bảo vệ khả năng truy vết
+## 4. Bảo vệ khả năng truy vết — và giới hạn của nó
 
-`scrub_value` bỏ qua `SAFE_KEYS` = `ts`, `level`, `service`, `correlation_id`,
-`user_id_hash`, `session_id`, `feature`, `model`, `env`.
+`scrub_value` bỏ qua `SAFE_KEYS` = `ts`, `level`, `service`, `user_id_hash`,
+`model`, `env`.
 
 Lý do cụ thể: `user_id_hash` là hex 12 ký tự, có xác suất thật rơi vào dạng
-12 chữ số và bị pattern `cccd` xoá mất. Mất `user_id_hash` hoặc `correlation_id`
-là mất luôn khả năng nối Metrics → Traces → Logs, tức là hỏng mục tiêu chính của
-bài lab. Bằng chứng: `test_scrub_value_keeps_structural_fields_intact` và
-`test_correlation_metadata_survives_redaction`.
+12 chữ số và bị pattern `cccd` xoá mất. Mất `user_id_hash` là mất khả năng nối
+Metrics → Traces → Logs, tức là hỏng mục tiêu chính của bài lab.
+Bằng chứng: `test_scrub_value_keeps_structural_fields_intact`.
+
+### Lỗi tự phát hiện khi rà lại yêu cầu
+
+Bản đầu tiên của `SAFE_KEYS` có thêm `session_id`, `feature` và `correlation_id`.
+Đó là sai: cả ba đều **do client kiểm soát** — `session_id`/`feature` đến thẳng từ
+body `ChatRequest`, `correlation_id` lấy từ header `x-request-id` nếu client gửi.
+Đưa chúng vào danh sách miễn scrub nghĩa là mở lại đúng đường rò vừa bịt.
+
+Đo được: log một record với `session_id="0912345678"` và
+`feature="lienhe-4111 1111 1111 1111"` → `validate_logs.py` báo
+`LEAK -> ['credit_card', 'phone_vn']`. Sau khi loại ba key này khỏi `SAFE_KEYS` →
+`sach`.
+
+Việc redact không phá correlation, vì redact là ánh xạ tất định: cùng một
+`correlation_id` luôn cho ra cùng một chuỗi `[REDACTED_*]`, nên các log của cùng
+một request vẫn nối được với nhau. Bằng chứng:
+`test_client_controlled_fields_are_scrubbed` và
+`test_redacted_correlation_id_still_correlates`.
+
+Nguyên tắc rút ra: chỉ field **server tự sinh** mới được miễn scrub.
+
+### Đề xuất cho phần Middleware (ngoài phạm vi CP1 Security)
+
+`app/middleware.py` hiện nhận `x-request-id` từ client mà không kiểm tra định
+dạng. Nên chỉ chấp nhận header khi khớp `^[A-Za-z0-9_-]{1,64}$`, ngược lại tự
+sinh `req-<8hex>`. Đây là hardening ở biên, thuộc file của thành viên phụ trách
+middleware nên chưa tự sửa; hiện tại rủi ro đã được chặn ở lớp scrub.
 
 ## 5. Kết quả kiểm chứng
 
