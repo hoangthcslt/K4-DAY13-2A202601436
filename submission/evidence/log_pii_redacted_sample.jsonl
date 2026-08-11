@@ -1,0 +1,8 @@
+{"service": "api", "payload": {"message_preview": "Lien he toi qua so [REDACTED_PHONE_VN] hoac email [REDACTED_EMAIL], the cua toi ..."}, "event": "request_received", "correlation_id": "req-d3957b65", "session_id": "evidence-session", "user_id_hash": "23eb0de44cad", "model": "claude-sonnet-4-5", "feature": "qa", "env": "dev", "level": "info", "ts": "2026-08-11T07:59:29.019952Z"}
+{"service": "api", "latency_ms": 577, "tokens_in": 44, "tokens_out": 102, "cost_usd": 0.001662, "quality_score": 0.9, "payload": {"answer_preview": "Starter answer. Teams should improve this output logic and add better quality ch..."}, "event": "response_sent", "correlation_id": "req-d3957b65", "session_id": "evidence-session", "user_id_hash": "23eb0de44cad", "model": "claude-sonnet-4-5", "feature": "qa", "env": "dev", "level": "info", "ts": "2026-08-11T07:59:29.600817Z"}
+{"service": "api", "payload": {"message_preview": "The: [REDACTED_CREDIT_CARD]"}, "event": "request_received", "correlation_id": "req-1a6844a8", "session_id": "evidence-session2", "user_id_hash": "f6768c3d20e7", "model": "claude-sonnet-4-5", "feature": "qa", "env": "dev", "level": "info", "ts": "2026-08-11T07:59:44.779701Z"}
+
+# Input goc gui vao API (khong ghi vao log, chi de doi chieu):
+# "Lien he toi qua so 0912345678 hoac email test.pii@example.com, the cua toi la 4111 1111 1111 1111"
+# "The: 4111 1111 1111 1111"
+# => email, so dien thoai VN, so the tin dung deu duoc redact truoc khi ghi JSONL.
