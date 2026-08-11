@@ -8,7 +8,7 @@ from typing import Any
 import structlog
 from structlog.contextvars import merge_contextvars
 
-from .pii import scrub_text
+from .pii import scrub_value
 
 LOG_PATH = Path(os.getenv("LOG_PATH", "data/logs.jsonl"))
 
@@ -24,14 +24,8 @@ class JsonlFileProcessor:
 
 
 def scrub_event(_: Any, __: str, event_dict: dict[str, Any]) -> dict[str, Any]:
-    payload = event_dict.get("payload")
-    if isinstance(payload, dict):
-        event_dict["payload"] = {
-            k: scrub_text(v) if isinstance(v, str) else v for k, v in payload.items()
-        }
-    if "event" in event_dict and isinstance(event_dict["event"], str):
-        event_dict["event"] = scrub_text(event_dict["event"])
-    return event_dict
+    """Che PII trên toàn bộ event: payload lồng nhau, traceback và mọi field tự thêm."""
+    return scrub_value(event_dict)
 
 
 
@@ -42,9 +36,12 @@ def configure_logging() -> None:
             merge_contextvars,
             structlog.processors.add_log_level,
             structlog.processors.TimeStamper(fmt="iso", utc=True, key="ts"),
-            scrub_event,
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
+            # scrub_event phải đứng sau format_exc_info: traceback chỉ tồn tại dưới
+            # dạng chuỗi sau processor đó, và phải đứng trước JsonlFileProcessor
+            # vì file JSONL được ghi ngay tại đây.
+            scrub_event,
             JsonlFileProcessor(),
             structlog.processors.JSONRenderer(),
         ],
