@@ -27,17 +27,20 @@ PII_PATTERNS: dict[str, str] = {
     ),
 }
 
-# Field cấu trúc của log: không scrub để tránh làm hỏng khả năng truy vết.
+# Field do server tự sinh: không scrub để tránh làm hỏng khả năng truy vết.
 # user_id_hash là hex 12 ký tự nên có thể trùng dạng CCCD 12 số và bị xoá nhầm.
+#
+# Chỉ được liệt kê field mà server kiểm soát hoàn toàn. session_id, feature và
+# correlation_id đều đến từ request của client (body ChatRequest, header
+# x-request-id) nên phải đi qua bộ scrub: client có thể đặt PII vào đó.
+# Redact không phá được correlation vì cùng một giá trị luôn cho ra cùng một
+# chuỗi [REDACTED_*], các log của cùng request vẫn nối được với nhau.
 SAFE_KEYS: frozenset[str] = frozenset(
     {
         "ts",
         "level",
         "service",
-        "correlation_id",
         "user_id_hash",
-        "session_id",
-        "feature",
         "model",
         "env",
     }
